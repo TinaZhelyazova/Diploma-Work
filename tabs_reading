@@ -1,0 +1,45 @@
+class Tabs(object):
+
+    def __init__(self, filename):
+        self.symbols = ['h', '/', 'p', '\\', '*', '^', '|', "e", "B", "G", "D", "A",
+                        "E"]  # characters which will be removed from the tabs lines
+        self.a = []  # here we will store the processed tab data
+        # MIDI equivalent of e B G D A E
+        self.notes = [64, 59, 55, 50, 45, 40]  # MIDI numbers corresponding to the open strings of a guitar
+        self.filename = filename  # filename of the input tab file
+
+    def preprocess(self):  # this method reads the tab file, cleans and formats it
+        with open(self.filename) as f:
+            content = f.readlines()  # reads all lines from the tab file and stores them in the content list
+
+        content = [x.strip() for x in content]  # removes whitespaces if any
+
+        for symbol in self.symbols:  # iterates through each symbol in symbols
+            for i, line in enumerate(content):  # iterates through each line in tabs file
+                content[i] = line.replace(symbol, "-")  # replaces all occurrences of 'symbol' with '-'
+
+        for i in range(len(content)):  # adds spaces between each character in the tabs lines
+            for j in range(len(content[i])):  # iterates over each character in the current line
+                content[i] = content[i][:(2 * j) + 1] + " " + content[i][(2 * j) + 1:]
+            content[i] = content[i][:len(content[i]) - 1]
+
+        for i, line in enumerate(content):  # we take each line and split it into a list pf strings
+            self.a.append(line.split(" "))
+
+        for i in range(
+                len(self.a)):  # this checks if in the list of strings there is a "1" followed by another digit. If yes, it combines them
+            for j in range(len(self.a[i])):  # iterates over each element
+                if self.a[i][j] == '1':  # checks if current character is 1
+                    if self.a[i][j + 1] != '-':  # checks if the following character is differetn than '-'
+                        self.a[i][j] = str(((int(self.a[i][j]) * 10) + int(self.a[i][
+                                                                               j + 1])))  # combines the two digits, converts them to string and assigns the current position
+                        self.a[i][j + 1] = '-'  # replaces the next character with '-'
+
+    def convertNotes(self):  # convert the tabs into MIDI
+        for i in range(len(self.a)):  # iterates over each line in the matrix
+            for j in range(len(self.a[i])):  # iterates over each element in the current line
+                if self.a[i][j] != '-' and self.a[i][j] != '': # checks if the current symbol is note
+                    try:
+                        self.a[i][j] = str(int(self.a[i][j]) + self.notes[i])  # converts the current str number into ints and ads the corresponding note from sef.notes
+                    except ValueError:
+                        print(f"Skipping invalid note value: {self.a[i][j]}")
