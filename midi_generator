@@ -1,0 +1,29 @@
+from midiutil import MIDIFile
+
+
+class Track:
+    def __init__(self, tempo):
+        self.track = 0  # specifies track number in the MIDI file
+        self.channel = 0  # sets the MIDI Chaneel
+        self.time = 0.125  # It represents the duration of each note
+        self.duration = 0.1  # the duration of each note in beats
+        self.tempo = tempo  # In beats (BPM)
+        self.volume = 100  # 0-127, as per the MIDI standard
+
+    def midiGenerator(self, a):
+        MyMIDI = MIDIFile(1)  # Creates a new single-track MIDI file
+        MyMIDI.addProgramChange(self.track, self.channel, self.time, 29)  # sets the event, on which track, chanel should be played, the time each note should be played and the type of instrument
+        MyMIDI.addTempo(self.track, self.time, self.tempo)  # sets the tempo
+
+        time = 0  # keeps track of current time position
+        for i in range(len(a[0])):  # iterates through the a[] list and maps every character
+            for j in range(len(a)):
+                duration = self.duration  # the duration of each note is set to the self.duration
+                if a[j][i] != '-':  # this checks if the character in the current cell is '-'. If it is not it is assumed to be a note
+                    if i + 1 < len(a[j]) and a[j][i + 1] == '-':         # this chcecks wether the next character is note or '-'.
+                        duration = self.duration + 1                # If it is '-' the note duration is extended with 1 beat
+                    MyMIDI.addNote(self.track, self.channel, int(a[j][i]), time, duration, self.volume)  # here we add the notes to a MIDI file
+            time += self.time  # moving to the next beat
+
+        with open("output.mid", "wb") as output_file:  # writes the MIDI over the name "output.mid"
+            MyMIDI.writeFile(output_file)
