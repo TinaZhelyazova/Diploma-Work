@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIDI Generator</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>MIDI Generator</h1>
+    <form action="/generate_midi" method="post" enctype="multipart/form-data">
+        <label for="file">Upload Tabs File:</label>
+        <input type="file" id="file" name="file" required><br><br>
+        <label for="tempo">Tempo:</label>
+        <input type="text" id="tempo" name="tempo" placeholder="Enter tempo (default 120)"><br><br>
+        <input type="submit" value="Generate MIDI">
+    </form>
+</body>
+</html>
